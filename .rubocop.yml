@@ -44,6 +44,9 @@ Lint/DeprecatedOpenSSLConstant:
 Lint/RaiseException:
   Enabled: false
 
+Naming/VariableNumber:
+  Enabled: false
+
 Metrics/AbcSize:
   Max: 15
   Exclude:
@@ -86,6 +89,21 @@ RSpec/MultipleExpectations:
   Enabled: false
 
 RSpec/NamedSubject:
+  Enabled: false
+
+RSpec/SubjectStub:
+  Enabled: false
+
+RSpec/NestedGroups:
+  Max: 5
+
+RSpec/AnyInstance:
+  Enabled: false
+
+RSpec/MultipleMemoizedHelpers:
+  Max: 7
+
+RSpec/LetSetup:
   Enabled: false
 
 Style/ArrayCoercion:
@@ -134,4 +152,7 @@ Style/SlicingWithRange:
   Enabled: false
 
 Style/StringConcatenation:
+  Enabled: false
+
+FactoryBot/FactoryAssociationWithStrategy:
   Enabled: false

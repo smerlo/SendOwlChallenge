@@ -25,6 +25,8 @@ Rails.application.routes.draw do
       resources :settings, only: [] do
         get :must_update, on: :collection
       end
+
+      resource :journeys, only: %i[create update]
     end
   end
 end

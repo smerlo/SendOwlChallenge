@@ -8,15 +8,13 @@ default: &default
   port: <%= ENV.fetch('POSTGRES_PORT', '5432') %>
 
 development:
-  <<: *default
-  database: rails_api_base_development
+ <<: *default
+ database: oyster_api_development
 
 test:
-  <<: *default
-  database: rails_api_base_test
+ <<: *default
+ database: oyster_api_test
 
-# For production is recommended to set DATABASE_URL env variable.
-# It will take precedence over the config defined here.
-# https://edgeguides.rubyonrails.org/configuring.html#connection-preference
 production:
-  <<: *default
+ <<: *default
+ url: <%= ENV['DATABASE_URL'] %>

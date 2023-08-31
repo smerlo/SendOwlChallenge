@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_07_04_182448) do
+ActiveRecord::Schema[7.0].define(version: 2023_08_31_184333) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
   enable_extension "plpgsql"
@@ -62,6 +62,12 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_04_182448) do
     t.index ["reset_password_token"], name: "index_admin_users_on_reset_password_token", unique: true
   end
 
+  create_table "cards", force: :cascade do |t|
+    t.decimal "balance", default: "0.0", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "delayed_jobs", id: :serial, force: :cascade do |t|
     t.integer "priority", default: 0, null: false
     t.integer "attempts", default: 0, null: false
@@ -102,6 +108,14 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_04_182448) do
     t.index ["error_group_id"], name: "index_exception_hunter_errors_on_error_group_id"
   end
 
+  create_table "fares", force: :cascade do |t|
+    t.string "fare_type", null: false
+    t.decimal "amount", precision: 5, scale: 2, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["fare_type"], name: "index_fares_on_fare_type", unique: true
+  end
+
   create_table "flipper_features", force: :cascade do |t|
     t.string "key", null: false
     t.datetime "created_at", null: false
@@ -118,12 +132,41 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_04_182448) do
     t.index ["feature_key", "key", "value"], name: "index_flipper_gates_on_feature_key_and_key_and_value", unique: true
   end
 
+  create_table "journeys", force: :cascade do |t|
+    t.bigint "card_id"
+    t.bigint "start_station_id"
+    t.bigint "end_station_id"
+    t.boolean "bus_journey", default: false, null: false
+    t.boolean "completed", default: false, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["card_id"], name: "index_journeys_on_card_id"
+    t.index ["end_station_id"], name: "index_journeys_on_end_station_id"
+    t.index ["start_station_id"], name: "index_journeys_on_start_station_id"
+  end
+
   create_table "settings", force: :cascade do |t|
     t.string "key", null: false
     t.string "value"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["key"], name: "index_settings_on_key", unique: true
+  end
+
+  create_table "stations", force: :cascade do |t|
+    t.string "name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_stations_on_name", unique: true
+  end
+
+  create_table "transactions", force: :cascade do |t|
+    t.decimal "amount"
+    t.string "description"
+    t.bigint "card_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["card_id"], name: "index_transactions_on_card_id"
   end
 
   create_table "users", id: :serial, force: :cascade do |t|
@@ -150,6 +193,29 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_04_182448) do
     t.index ["uid", "provider"], name: "index_users_on_uid_and_provider", unique: true
   end
 
+  create_table "zone_stations", force: :cascade do |t|
+    t.bigint "station_id", null: false
+    t.bigint "zone_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["station_id", "zone_id"], name: "index_zone_stations_on_station_id_and_zone_id", unique: true
+    t.index ["station_id"], name: "index_zone_stations_on_station_id"
+    t.index ["zone_id"], name: "index_zone_stations_on_zone_id"
+  end
+
+  create_table "zones", force: :cascade do |t|
+    t.integer "number", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["number"], name: "index_zones_on_number", unique: true
+  end
+
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "exception_hunter_errors", "exception_hunter_error_groups", column: "error_group_id"
+  add_foreign_key "journeys", "cards"
+  add_foreign_key "journeys", "stations", column: "end_station_id"
+  add_foreign_key "journeys", "stations", column: "start_station_id"
+  add_foreign_key "transactions", "cards"
+  add_foreign_key "zone_stations", "stations"
+  add_foreign_key "zone_stations", "zones"
 end
