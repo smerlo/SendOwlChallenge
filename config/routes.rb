@@ -27,6 +27,12 @@ Rails.application.routes.draw do
       end
 
       resource :journeys, only: %i[create update]
+
+      resources :cards, only: [] do
+        member do
+          post :add_balance
+        end
+      end
     end
   end
 end
