@@ -18,7 +18,6 @@
 class Transaction < ApplicationRecord
   belongs_to :card
 
-  validates :amount, presence: true
+  validates :amount, :description, presence: true
   validates :amount, numericality: true
-  validates :description, presence: true
 end

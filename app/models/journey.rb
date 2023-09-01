@@ -25,4 +25,6 @@ class Journey < ApplicationRecord
   belongs_to :end_station, class_name: 'Station', optional: true
 
   validates :bus_journey, inclusion: { in: [true, false] }
+
+  scope :ongoing_journey, ->(card_id) { where(card_id:, completed: false).last }
 end

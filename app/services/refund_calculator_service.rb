@@ -13,9 +13,6 @@ class RefundCalculatorService
 
     return if difference <= 0
 
-    @card.balance += difference
-
-    @card.transactions.create!(amount: difference, description: 'Refund for journey')
-    @card.save!
+    @card.add_balance(difference, 'Refund for journey')
   end
 end

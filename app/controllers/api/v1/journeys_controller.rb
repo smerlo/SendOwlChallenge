@@ -4,16 +4,11 @@ module Api
   module V1
     class JourneysController < ApplicationController
       skip_before_action :verify_authenticity_token
+      before_action :find_card, only: %i[create update]
 
       def create
-        card = find_card
-        unless card
-          render(json: { error: 'Card not found' }, status: :not_found)
-          return
-        end
-
-        journey = build_journey(card)
-        charge_for_journey(card, journey)
+        journey = build_journey(@card)
+        charge_for_journey(@card, journey)
 
         if journey.save
           render json: journey.card, status: :created
@@ -23,13 +18,9 @@ module Api
       end
 
       def update
-        card = find_card
-        unless card
-          render(json: { error: 'Card not found' }, status: :not_found)
-          return
-        end
-        journey = find_ongoing_journey(card)
-        return unless journey
+        journey = find_ongoing_journey(@card)
+
+        return render_not_found_journey if journey.blank?
 
         complete_journey(journey)
 
@@ -44,11 +35,11 @@ module Api
       private
 
       def find_card
-        Card.find_by(id: params[:card_number])
+        @card = Card.find(params[:card_number])
       end
 
       def build_journey(card)
-        if params[:bus_journey] && params[:bus_journey] == 'true'
+        if params[:bus_journey] == 'true'
           card.journeys.build(bus_journey: true, completed: true)
         else
           card.journeys.build(start_station_id: params[:start_station_id], bus_journey: false)
@@ -56,22 +47,20 @@ module Api
       end
 
       def charge_for_journey(card, journey)
-        if journey.bus_journey
-          FareChargerService.new(card).charge_bus_journey
-        else
-          FareChargerService.new(card).charge_max
-        end
+        FareChargerService.new(card).charge_journey(journey)
       end
 
       def find_ongoing_journey(card)
-        journey = card.journeys.where(completed: false).last
-        render(json: { error: 'No ongoing journey found for this card' }, status: :not_found) unless journey
-        journey
+        card.journeys.ongoing_journey(card.id)
       end
 
       def complete_journey(journey)
         journey.end_station_id = params[:end_station_id]
         journey.completed = true
+      end
+
+      def render_not_found_journey
+        render(json: { error: 'Journey not found' }, status: :not_found)
       end
     end
   end

@@ -15,13 +15,17 @@ class Card < ApplicationRecord
 
   validates :balance, presence: true, numericality: { greater_than_or_equal_to: 0 }
 
-  def charge(amount)
+  scope :with_ongoing_journey, lambda {
+                                 joins(:journeys).merge(Journey.incomplete).order('journeys.created_at DESC').limit(1)
+                               }
+
+  def charge(amount, description)
     update!(balance: balance - amount)
-    transactions.create!(amount: -amount, description: 'Travel charge')
+    transactions.create!(amount: -amount, description:)
   end
 
-  def add_balance(amount)
+  def add_balance(amount, description)
     update!(balance: balance + amount)
-    transactions.create!(amount:, description: 'Top up')
+    transactions.create!(amount:, description:)
   end
 end

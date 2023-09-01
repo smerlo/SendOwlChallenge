@@ -10,7 +10,6 @@ class FareCalculatorService
   def calculate
     return Fare.bus_journey.first.amount if journey.bus_journey?
 
-    # journey.preload(start_station: :zones, end_station: :zones)
     calculate_train_fare
   end
 
@@ -24,6 +23,8 @@ class FareCalculatorService
       two_zone_fare
     when 3
       three_zone_fare
+    else
+      Fare.maximum(:amount)
     end
   end
 

@@ -30,9 +30,10 @@ RSpec.describe 'Api::V1::Journeys' do
     context 'when card does not exist' do
       subject { put api_v1_journeys_path(card_number: 'non_existent') }
 
-      it 'returns not found status' do
-        subject
-        expect(response).to have_http_status(:not_found)
+      it 'returns not found error' do
+        expect {
+          subject
+        }.to raise_error(ActiveRecord::RecordNotFound)
       end
     end
 
