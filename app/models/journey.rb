@@ -26,5 +26,5 @@ class Journey < ApplicationRecord
 
   validates :bus_journey, inclusion: { in: [true, false] }
 
-  scope :ongoing_journey, ->(card_id) { where(card_id:, completed: false).last }
+  scope :ongoing_journey, -> { where(completed: false, bus_journey: false).order(id: :desc).limit(1).first }
 end

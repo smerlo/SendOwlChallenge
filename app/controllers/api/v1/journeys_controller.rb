@@ -18,17 +18,16 @@ module Api
       end
 
       def update
-        journey = find_ongoing_journey(@card)
+        @journey = find_ongoing_journey(@card)
+        return render_not_found_journey if @journey.blank?
 
-        return render_not_found_journey if journey.blank?
+        complete_journey
 
-        complete_journey(journey)
-
-        if journey.save
-          RefundCalculatorService.new(journey).process_refund
-          render json: journey.card
+        if @journey.save
+          RefundCalculatorService.new(@journey).process_refund
+          render json: @journey.card
         else
-          render json: journey.errors, status: :unprocessable_entity
+          render json: @journey.errors, status: :unprocessable_entity
         end
       end
 
@@ -39,7 +38,7 @@ module Api
       end
 
       def build_journey(card)
-        if params[:bus_journey] == 'true'
+        if params[:bus_journey]
           card.journeys.build(bus_journey: true, completed: true)
         else
           card.journeys.build(start_station_id: params[:start_station_id], bus_journey: false)
@@ -51,12 +50,12 @@ module Api
       end
 
       def find_ongoing_journey(card)
-        card.journeys.ongoing_journey(card.id)
+        card.journeys.ongoing_journey
       end
 
-      def complete_journey(journey)
-        journey.end_station_id = params[:end_station_id]
-        journey.completed = true
+      def complete_journey
+        @journey.end_station_id = params[:end_station_id]
+        @journey.completed = true
       end
 
       def render_not_found_journey

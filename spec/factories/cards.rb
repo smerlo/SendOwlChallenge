@@ -11,6 +11,6 @@
 #
 FactoryBot.define do
   factory :card do
-    balance { Faker::Number.between(from: 0, to: 100) }
+    balance { Faker::Number.between(from: 5, to: 100) }
   end
 end

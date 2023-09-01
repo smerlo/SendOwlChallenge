@@ -10,11 +10,11 @@ RSpec.describe 'Api::V1::Journeys' do
     let!(:zone) { create(:zone, number: 1) }
     let!(:start_station) { create(:station, zones: [zone]) }
     let!(:end_station) { create(:station, zones: [zone]) }
-    let!(:fare) { create(:fare, fare_type: 'zone_1', amount: 30.0) }
-    let!(:journey) { create(:journey, card:, start_station:, completed: false) }
+    let!(:fare) { create(:fare, fare_type: 'zone_1', amount: 2.0) }
+    let!(:journey) { create(:journey, card:, start_station:, end_station: nil, completed: false) }
 
     context 'when card exists' do
-      let(:params) { { end_station_id: end_station.id } }
+      let(:params) { { card_number: card.id, end_station_id: end_station.id } }
 
       it 'completes the journey' do
         subject
@@ -38,7 +38,10 @@ RSpec.describe 'Api::V1::Journeys' do
     end
 
     context 'when journey does not exist' do
-      before { journey.destroy }
+      before do
+        journey.destroy!
+        allow(card.journeys).to receive(:ongoing_journey).and_return(nil)
+      end
 
       let(:params) { { end_station_id: 1 } }
 
