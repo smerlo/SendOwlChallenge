@@ -65,7 +65,7 @@ group :development do
 end
 
 group :test do
-  gem 'faker', '~> 2.13'
+  gem 'faker', '~> 3.2'
   gem 'pg_query', '~> 4.2.1'
   gem 'prosopite', '~> 1.3.2'
   gem 'shoulda-matchers', '~> 5.3'
